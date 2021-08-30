@@ -25,7 +25,7 @@ const PizzaSize = (props) => {
   const [selectToppings, setSelectToppings] = useState([]);
   const [selectPizzaSize, setSelectPizzaSize] = useState('');
 
-  const handleChange = (param) => {
+  const handleChange = (event, param) => {
     setSelectToppings(param.map((ele) => ele.name));
   };
 
@@ -58,11 +58,11 @@ const PizzaSize = (props) => {
           <form onSubmit={handleSubmitData}>
             <div className={classes.root}>
               {toppingsIsRadio === 'false' ? (
-                <Autocomplete multiple id='tags-outlined' onChange={handleChange} options={toppingsOpt} getOptionLabel={(toppingsOpt) => toppingsOpt.name} renderInput={(params) => <TextField {...params} variant='outlined' label={toppingsTitle.join('')} placeholder={toppingsTitle.join('')} />} />
+                <Autocomplete multiple id='tags-outlined' onChange={handleChange} options={toppingsOpt} getOptionLabel={(toppingsOpt) => toppingsOpt.name} renderInput={(params) => <TextField {...params} variant='outlined' label={toppingsTitle} placeholder={toppingsTitle} />} />
               ) : (
                 <FormControl variant='outlined' className={classes.formControl}>
-                  <InputLabel id='demo-simple-select-outlined-label'>{toppingsTitle.join('')}</InputLabel>
-                  <Select labelId='demo-simple-select-outlined-label' id='demo-simple-select-outlined' value={selectToppings} onChange={handleToppingsChange} label={toppingsTitle.join('')}>
+                  <InputLabel id='demo-simple-select-outlined-label'>{toppingsTitle}</InputLabel>
+                  <Select labelId='demo-simple-select-outlined-label' id='demo-simple-select-outlined' value={selectToppings} onChange={handleToppingsChange} label={toppingsTitle}>
                     <MenuItem value=''>
                       <em>None</em>
                     </MenuItem>
@@ -78,8 +78,8 @@ const PizzaSize = (props) => {
               )}
 
               <FormControl variant='outlined' className={classes.formControl}>
-                <InputLabel id='demo-simple-select-outlined-label'>{pizzaName.join('')}</InputLabel>
-                <Select labelId='demo-simple-select-outlined-label' id='demo-simple-select-outlined' value={selectPizzaSize} onChange={handleSizeChange} label={pizzaName.join('')}>
+                <InputLabel id='demo-simple-select-outlined-label'>{pizzaName}</InputLabel>
+                <Select labelId='demo-simple-select-outlined-label' id='demo-simple-select-outlined' value={selectPizzaSize} onChange={handleSizeChange} label={pizzaName}>
                   <MenuItem value=''>
                     <em>None</em>
                   </MenuItem>
