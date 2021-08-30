@@ -17,7 +17,13 @@ const PizzaList = (props) => {
   useEffect(() => {
     if (searchPizza.length > 0) {
       const data = pizza.filter((ele) => ele.name.toLowerCase().includes(searchPizza.toLowerCase()));
-      setFilteredData(data);
+      console.log(data);
+      if (data.length != 0) {
+        setFilteredData(data);
+      } else {
+        alert('Not Found');
+        setFilteredData(pizza);
+      }
     } else {
       setFilteredData(pizza);
     }
