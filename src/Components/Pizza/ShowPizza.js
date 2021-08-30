@@ -1,112 +1,153 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+
+import { addCartItemsList } from '../../Actions/CartItemsAction';
+import PizzaSize from './PizzaSize';
 
 import { makeStyles } from '@material-ui/core/styles';
-import { Dialog, DialogTitle, DialogContent, Typography, Button, Grid, TextField, InputLabel, MenuItem, FormControl, Select } from '@material-ui/core';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import SendIcon from '@material-ui/icons/Send';
-import CancelIcon from '@material-ui/icons/Cancel';
+import { Card, CardActionArea, CardActions, CardContent, CardMedia, Button, Typography, Grid } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   root: {
-    width: 500,
-    '& > * + *': {
-      marginTop: theme.spacing(3),
-    },
+    maxWidth: 345,
   },
-  formControl: {
-    minWidth: 500,
+  media: {
+    height: 140,
+  },
+  text: {
+    padding: theme.spacing(0.5),
   },
 }));
 
-const PizzaSize = (props) => {
+const ShowPizza = ({ id, name, description, isVeg, rating, price, img_url, size, toppings }) => {
+  const dispatch = useDispatch();
   const classes = useStyles();
-  const { handleModalClose, open, toppingsIsRadio, toppingsOpt, toppingsTitle, pizzaSize, pizzaName, customizePizzaData } = props;
+  const [open, setOpen] = useState(false);
+  const [toppingsIsRadio, setToppingsIsRadio] = useState(false);
+  const [toppingsOpt, setToppingsOpt] = useState([]);
+  const [toppingsTitle, setToppingsTitle] = useState('');
+  const [pizzaSize, setPizzaSize] = useState([]);
+  const [pizzaSizeName, setPizzaSizeName] = useState('');
+  const [quantity] = useState(1);
 
-  const [selectToppings, setSelectToppings] = useState([]);
-  const [selectPizzaSize, setSelectPizzaSize] = useState('');
+  const [addOns, setAddOns] = useState({});
 
-  const handleChange = (event, param) => {
-    setSelectToppings(param.map((ele) => ele.name));
+  const handleModalOpen = () => {
+    const toopingsRadio = toppings.map((ele) => {
+      return ele.isRadio;
+    });
+    setToppingsIsRadio(toopingsRadio.join(''));
+
+    const toppingItem = toppings.map((ele) => {
+      return ele.items;
+    });
+    setToppingsOpt(toppingItem[0]);
+
+    const toppingTitle = toppings.map((ele) => {
+      return ele.title;
+    });
+    setToppingsTitle(toppingTitle);
+
+    const pizzasize = size.map((ele) => {
+      return ele.items;
+    });
+    setPizzaSize(pizzasize[0]);
+
+    const pizzaName = size.map((ele) => {
+      return ele.title;
+    });
+    setPizzaSizeName(pizzaName);
+    setOpen(!open);
   };
 
-  const handleToppingsChange = (e) => {
-    setSelectToppings([e.target.value]);
+  const handleModalClose = () => {
+    setOpen(!open);
   };
 
-  const handleSizeChange = (event) => {
-    setSelectPizzaSize(event.target.value);
+  const customizePizzaData = (formData) => {
+    setAddOns(formData);
   };
-  const handleSubmitData = (e) => {
-    e.preventDefault();
-    const formData = {
-      pizzaTopping: selectToppings,
-      pizzaSize: selectPizzaSize,
+
+  const handleSubmitCartItems = () => {
+    const cartItems = {
+      date: new Date(),
+      id: id,
+      name: name,
+      price: price,
+      image: img_url,
+      addOns: addOns,
+      quantity: quantity,
+      isVeg: isVeg,
     };
-    customizePizzaData(formData);
-    handleModalClose();
+    //console.log(cartItems);
+    dispatch(addCartItemsList(cartItems));
   };
 
   return (
     <>
-      <Dialog aria-labelledby='customized-dialog-title' open={open} maxWidth='md'>
-        <DialogTitle id='customized-dialog-title' onClose={handleModalClose}>
-          <Typography variant='body1' gutterBottom style={{ fontWeight: 'bold' }}>
-            Customize Your Favourite Pizza
-          </Typography>
-        </DialogTitle>
-        <DialogContent dividers>
-          <form onSubmit={handleSubmitData}>
-            <div className={classes.root}>
-              {toppingsIsRadio === 'false' ? (
-                <Autocomplete multiple id='tags-outlined' onChange={handleChange} options={toppingsOpt} getOptionLabel={(toppingsOpt) => toppingsOpt.name} renderInput={(params) => <TextField {...params} variant='outlined' label={toppingsTitle.join('')} placeholder={toppingsTitle.join('')} />} />
-              ) : (
-                <FormControl variant='outlined' className={classes.formControl}>
-                  <InputLabel id='demo-simple-select-outlined-label'>{toppingsTitle.join('')}</InputLabel>
-                  <Select labelId='demo-simple-select-outlined-label' id='demo-simple-select-outlined' value={selectToppings} onChange={handleToppingsChange} label={toppingsTitle.join('')}>
-                    <MenuItem value=''>
-                      <em>None</em>
-                    </MenuItem>
-                    {toppingsOpt.map((toppings, idx) => {
-                      return (
-                        <MenuItem value={toppings.name} key={idx}>
-                          {toppings.name}
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
-              )}
-
-              <FormControl variant='outlined' className={classes.formControl}>
-                <InputLabel id='demo-simple-select-outlined-label'>{pizzaName.join('')}</InputLabel>
-                <Select labelId='demo-simple-select-outlined-label' id='demo-simple-select-outlined' value={selectPizzaSize} onChange={handleSizeChange} label={pizzaName.join('')}>
-                  <MenuItem value=''>
-                    <em>None</em>
-                  </MenuItem>
-                  {pizzaSize.map((psize, idx) => {
-                    return (
-                      <MenuItem value={psize.size} key={idx}>
-                        {psize.size}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl>
-            </div>
-            <Grid item xs={2} style={{ marginTop: '.5rem' }}>
-              <Button type='submit' variant='contained' color='primary' size='large' className={classes.button} endIcon={<SendIcon />} align='center'>
-                Submit
-              </Button>
+      <Card className={classes.root}>
+        <CardActionArea>
+          <CardMedia className={classes.media} image={img_url} title='Contemplative Reptile' />
+          <CardContent>
+            <Grid container>
+              <Grid item xs={12} sm={9} className={classes.text}>
+                <Typography gutterBottom component='h2'>
+                  {name}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={3} className={classes.text}>
+                <Typography gutterBottom component='h5'>
+                  ₹ {price}
+                </Typography>
+              </Grid>
             </Grid>
-          </form>
-        </DialogContent>
 
-        <Button variant='contained' onClick={handleModalClose} color='secondary' size='large' className={classes.button} endIcon={<CancelIcon />} align='center'>
-          Cancel
-        </Button>
-      </Dialog>
+            <Typography variant='body2' color='textSecondary' component='p' style={{ marginBottom: '0.5rem' }}>
+              {description}
+            </Typography>
+
+            <Grid container>
+              <Grid item xs={12} sm={8} className={classes.text}>
+                <Typography gutterBottom component='h2'>
+                  {isVeg ? 'Veg' : 'Non-Veg'}
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={4} className={classes.text}>
+                <Typography gutterBottom component='h5'>
+                  Rating: {rating}
+                </Typography>
+              </Grid>
+            </Grid>
+
+            {Object.keys(addOns).length > 0 && (
+              <Grid container>
+                <Grid item xs={12} className={classes.text}>
+                  <Typography gutterBottom variant='body2' color='textSecondary' component='p'>
+                    <strong>Toopings: </strong> {addOns.pizzaTopping.map((ele) => ele).join(', ')}
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} className={classes.text}>
+                  <Typography gutterBottom variant='body2' color='textSecondary' component='p'>
+                    <strong>Size:</strong> {addOns.pizzaSize}
+                  </Typography>
+                </Grid>
+              </Grid>
+            )}
+          </CardContent>
+        </CardActionArea>
+
+        <CardActions>
+          <Button size='small' color='primary' onClick={handleModalOpen}>
+            Customize Pizza
+          </Button>
+          <Button size='small' color='primary' onClick={handleSubmitCartItems}>
+            Add to Cart
+          </Button>
+        </CardActions>
+      </Card>
+      {open && <PizzaSize handleModalClose={handleModalClose} open={open} toppingsIsRadio={toppingsIsRadio} toppingsOpt={toppingsOpt} toppingsTitle={toppingsTitle} pizzaSize={pizzaSize} pizzaName={pizzaSizeName} customizePizzaData={customizePizzaData} />}
     </>
   );
 };
 
-export default PizzaSize;
+export default ShowPizza;
