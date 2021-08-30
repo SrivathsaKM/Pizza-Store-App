@@ -9,7 +9,7 @@ import ConfigureStore from './Store';
 const store = ConfigureStore();
 
 store.subscribe(() => {
-  console.log(store.getState());
+  //console.log(store.getState());
 });
 
 ReactDOM.render(
